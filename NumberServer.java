@@ -4,24 +4,27 @@ import java.net.URI;
 class Handler implements URLHandler {
     // The one bit of state on the server: a number that will be manipulated by
     // various requests.
-    int num = 0;
+    String chatHistory = "";
 
     public String handleRequest(URI url) {
         if (url.getPath().equals("/")) {
-            return String.format("Number: %d", num);
-        } else if (url.getPath().equals("/increment")) {
-            num += 1;
-            return String.format("Number incremented!");
-        } else {
-            if (url.getPath().contains("/add")) {
-                String[] parameters = url.getQuery().split("=");
-                if (parameters[0].equals("count")) {
-                    num += Integer.parseInt(parameters[1]);
-                    return String.format("Number increased by %s! It's now %d", parameters[1], num);
+            return "This is a chat server. The messages written in the past are displayed here: " + chatHistory;
+        } 
+        
+        else if (url.getPath().contains("/add-message")) {
+            String[] parameters = url.getQuery().split("&");
+            String[] separatedParamsString = parameters[0].split("=");
+            String[] separatedParamsUser = parameters[1].split("=");
+
+            if (separatedParamsString[0].equals("s")) {
+                if (separatedParamsUser[0].equals("user")) {
+                    chatHistory += String.format("%s: %s", separatedParamsUser[1], separatedParamsString[1]) + "\n";
+                    return chatHistory;
                 }
             }
-            return "404 Not Found!";
         }
+
+        return "404 Not Found!";
     }
 }
 
